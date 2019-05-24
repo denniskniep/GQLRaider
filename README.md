@@ -42,5 +42,3 @@ JSON-encoded body
   "variables": { "myVariable": "someValue", ... }
 }
 ```
-
-## Develop 
