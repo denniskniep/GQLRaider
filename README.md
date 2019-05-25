@@ -1,4 +1,5 @@
 # GraphQL Raider - GQL Burp Extension
+[![Build Status](https://travis-ci.com/denniskniep/GQLRaider.svg?branch=master)](https://travis-ci.com/denniskniep/GQLRaider)
 
 ## Description
 GraphQL Raider is a Burp Suite Extension for testing endpoints implementing GraphQL.

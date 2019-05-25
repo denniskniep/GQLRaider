@@ -3,3 +3,4 @@ sudo: false # faster builds
 jdk:
   - oraclejdk8
   - openjdk8
+script: "mvn clean package"
