@@ -13,7 +13,7 @@ public class GqlEditorTest {
     String requestBody = "{\"operationName\":null,\"variables\":{\"abc\":\"123\"},\"query\":\"{ human(id: $abc) { name appearsIn starships { name } } }\"}";
     GqlRequestParser parser = new GqlRequestParser();
     GqlRequest original = parser.parse(requestBody);
-    GqlRequest modified  =new GqlRequest(null, null, "{\"abc\":\"789\"}", null);
+    GqlRequest modified  =new GqlRequest(null, null, "{\"abc\":\"456\"}", null);
     GqlEditor editor = new GqlEditor();
     String modifiedRequest = editor.modify(original, modified);
     assertThat(modifiedRequest, is("{\"operationName\":null,\"variables\":{\"abc\":\"456\"},\"query\":\"{ human(id: $abc) { name appearsIn starships { name } } }\"}"));
