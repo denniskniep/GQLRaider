@@ -26,6 +26,7 @@
   </dependencies>
 
   <build>
+    <finalName>gql</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
