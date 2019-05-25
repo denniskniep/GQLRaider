@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class GqlRequestParserTests {
+public class GqlRequestParserTest {
 
   @Test
   public void parseRequest_querySet() {

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import org.junit.Test;
 
-public class GqlEditorTests {
+public class GqlEditorTest {
 
   @Test
   public void modifyVariables() {
