@@ -12,7 +12,7 @@ public class GqlQueryParserTest {
   public void oneInjectionPoint() {
     String query = "{ human(id: 1002) { name appearsIn starships { name } } }";
 
-    List<GqlInjectionPoint> iPoints = getInjectionPoints(query);
+    List<GqlQueryInjectionPoint> iPoints = getInjectionPoints(query);
 
     assertThat(iPoints.size(), is(1));
     assertInjectionPoint(iPoints.get(0), "id", "1002", 12);
@@ -22,7 +22,7 @@ public class GqlQueryParserTest {
   public void oneInjectionPointWithEum() {
     String query = "{ human(type: BUZZ) { name appearsIn starships { name } } }";
 
-    List<GqlInjectionPoint> iPoints = getInjectionPoints(query);
+    List<GqlQueryInjectionPoint> iPoints = getInjectionPoints(query);
 
     assertThat(iPoints.size(), is(1));
     assertInjectionPoint(iPoints.get(0), "type", "BUZZ", 14);
@@ -40,7 +40,7 @@ public class GqlQueryParserTest {
         + "  }\n"
         + "}";
 
-    List<GqlInjectionPoint> iPoints = getInjectionPoints(query);
+    List<GqlQueryInjectionPoint> iPoints = getInjectionPoints(query);
 
     assertThat(iPoints.size(), is(4));
     assertInjectionPoint(iPoints.get(0), "episode", "1", 24);
@@ -49,12 +49,12 @@ public class GqlQueryParserTest {
     assertInjectionPoint(iPoints.get(3), "id", "500", 86);
   }
 
-  private List<GqlInjectionPoint> getInjectionPoints(String query) {
+  private List<GqlQueryInjectionPoint> getInjectionPoints(String query) {
     GqlQueryParser parser = new GqlQueryParser();
-    return parser.extractInsertationPoints(new GqlRequest(null, query, null, null));
+    return parser.extractInsertationPoints(query);
   }
 
-  private void assertInjectionPoint(GqlInjectionPoint iPoint, String name, String value, int offset) {
+  private void assertInjectionPoint(GqlQueryInjectionPoint iPoint, String name, String value, int offset) {
     assertThat(iPoint.getName(), is(name));
     assertThat(iPoint.getValue(), is(value));
     assertThat(iPoint.getOffset(), is(offset));

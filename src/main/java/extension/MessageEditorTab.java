@@ -7,10 +7,12 @@ import burp.IMessageEditorController;
 import burp.IMessageEditorTab;
 import burp.ITextEditor;
 import extension.gql.GqlEditor;
-import extension.gql.GqlInjectionPoint;
+import extension.gql.GqlQueryInjectionPoint;
 import extension.gql.GqlQueryParser;
 import extension.gql.GqlRequest;
 import extension.gql.GqlRequestParser;
+import extension.gql.GqlVariableInjectionPoint;
+import extension.gql.GqlVariableParser;
 import extension.utils.ArrayUtils;
 import extension.utils.Logger;
 import java.awt.Component;
@@ -101,11 +103,16 @@ public class MessageEditorTab implements IMessageEditorTab {
     }
   }
 
-  private String getInjectionPointsAsString(GqlRequest gqlRequests) {
-      GqlQueryParser parser = new GqlQueryParser();
-      List<GqlInjectionPoint> injectionPoints = parser.extractInsertationPoints(gqlRequests);
+  private String getInjectionPointsAsString(GqlRequest gqlRequest) {
+      List<GqlQueryInjectionPoint> queryInjectionPoints = new GqlQueryParser()
+          .extractInsertationPoints(gqlRequest.getQuery());
+
+      List<GqlVariableInjectionPoint> varInjectionPoints = new GqlVariableParser()
+          .extractInsertationPoints(gqlRequest.getVariables());
+
       StringBuilder builder = new StringBuilder();
-      for (GqlInjectionPoint injectionPoint : injectionPoints) {
+      for (GqlQueryInjectionPoint injectionPoint : queryInjectionPoints) {
+        builder.append("[query]");
         builder.append(injectionPoint.getName());
         builder.append(":");
         builder.append(injectionPoint.getValue());
@@ -118,7 +125,16 @@ public class MessageEditorTab implements IMessageEditorTab {
         builder.append(")");
         builder.append("\n");
       }
-      return builder.toString();
+
+    for (GqlVariableInjectionPoint injectionPoint : varInjectionPoints) {
+      builder.append("[var]");
+      builder.append(injectionPoint.getName());
+      builder.append(":");
+      builder.append(injectionPoint.getValue());
+      builder.append("\n");
+    }
+
+    return builder.toString();
   }
 
   private void clearTextField(ITextEditor textEditor) {

@@ -26,11 +26,11 @@ public class GqlEditorTests {
     GqlRequest original = requestParser.parse(requestBody);
 
     GqlQueryParser queryParser = new GqlQueryParser();
-    List<GqlInjectionPoint> iPoints = queryParser.extractInsertationPoints(original);
-    GqlInjectionPoint injectionPoint = iPoints.get(0);
+    List<GqlQueryInjectionPoint> iPoints = queryParser.extractInsertationPoints(original.getQuery());
+    GqlQueryInjectionPoint injectionPoint = iPoints.get(0);
 
     GqlEditor editor = new GqlEditor();
-    String modified = editor.replace(original, injectionPoint, "4567");
+    String modified = editor.replaceInQuery(original, injectionPoint, "4567");
 
     assertThat(modified, is("{\"query\":\"{ human(id:4567) { name appearsIn starships { name } } }\"}"));
   }
@@ -42,11 +42,11 @@ public class GqlEditorTests {
     GqlRequest original = requestParser.parse(requestBody);
 
     GqlQueryParser queryParser = new GqlQueryParser();
-    List<GqlInjectionPoint> iPoints = queryParser.extractInsertationPoints(original);
-    GqlInjectionPoint injectionPoint = iPoints.get(0);
+    List<GqlQueryInjectionPoint> iPoints = queryParser.extractInsertationPoints(original.getQuery());
+    GqlQueryInjectionPoint injectionPoint = iPoints.get(0);
 
     GqlEditor editor = new GqlEditor();
-    String modifiedRequest = editor.replace(original, injectionPoint, "Peter");
+    String modifiedRequest = editor.replaceInQuery(original, injectionPoint, "Peter");
 
     assertThat(modifiedRequest, is("{\"query\":\"{ human(name: \\\"Peter\\\") { name appearsIn starships { name } } }\"}"));
   }
@@ -58,12 +58,44 @@ public class GqlEditorTests {
     GqlRequest original = requestParser.parse(requestBody);
 
     GqlQueryParser queryParser = new GqlQueryParser();
-    List<GqlInjectionPoint> iPoints = queryParser.extractInsertationPoints(original);
-    GqlInjectionPoint injectionPoint = iPoints.get(0);
+    List<GqlQueryInjectionPoint> iPoints = queryParser.extractInsertationPoints(original.getQuery());
+    GqlQueryInjectionPoint injectionPoint = iPoints.get(0);
 
     GqlEditor editor = new GqlEditor();
-    String modifiedRequest = editor.replace(original, injectionPoint, "Pe \"ter");
+    String modifiedRequest = editor.replaceInQuery(original, injectionPoint, "Pe \"ter");
 
     assertThat(modifiedRequest, is("{\"query\":\"{ human(name: \\\"Pe \\\\\\\"ter\\\") { name appearsIn starships { name } } }\"}"));
+  }
+
+  @Test
+  public void replaceStringInVariable() {
+    String requestBody = "{\"query\":\"{ human { name } }\",\"variables\":{\"abc\":\"123\"}}";
+    GqlRequestParser requestParser = new GqlRequestParser();
+    GqlRequest original = requestParser.parse(requestBody);
+
+    GqlVariableParser variableParser = new GqlVariableParser();
+    List<GqlVariableInjectionPoint> iPoints = variableParser.extractInsertationPoints(original.getVariables());
+    GqlVariableInjectionPoint injectionPoint = iPoints.get(0);
+
+    GqlEditor editor = new GqlEditor();
+    String modifiedRequest = editor.replaceInVariables(original, injectionPoint, "Peter");
+
+    assertThat(modifiedRequest, is("{\"query\":\"{ human { name } }\",\"variables\":{\"abc\":\"Peter\"}}"));
+  }
+
+  @Test
+  public void replaceStringInVariableWithSpecialChars() {
+    String requestBody = "{\"query\":\"{ human { name } }\",\"variables\":{\"abc\":\"123\"}}";
+    GqlRequestParser requestParser = new GqlRequestParser();
+    GqlRequest original = requestParser.parse(requestBody);
+
+    GqlVariableParser variableParser = new GqlVariableParser();
+    List<GqlVariableInjectionPoint> iPoints = variableParser.extractInsertationPoints(original.getVariables());
+    GqlVariableInjectionPoint injectionPoint = iPoints.get(0);
+
+    GqlEditor editor = new GqlEditor();
+    String modifiedRequest = editor.replaceInVariables(original, injectionPoint, "Pe \"ter");
+
+    assertThat(modifiedRequest, is("{\"query\":\"{ human { name } }\",\"variables\":{\"abc\":\"Pe \\\"ter\"}}"));
   }
 }

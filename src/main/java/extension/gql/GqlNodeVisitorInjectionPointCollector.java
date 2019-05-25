@@ -20,14 +20,14 @@ import java.util.List;
 class GqlNodeVisitorInjectionPointCollector extends NodeVisitorStub {
 
   private static Logger logger = BurpExtender.getLogger();
-  private List<GqlInjectionPoint> injectionPoints = new ArrayList<>();
+  private List<GqlQueryInjectionPoint> injectionPoints = new ArrayList<>();
   private OffsetCalculator offsetCalculator;
 
   public GqlNodeVisitorInjectionPointCollector(String query) {
     this.offsetCalculator = new OffsetCalculator(query);
   }
 
-  public List<GqlInjectionPoint> getInjectionPoints() {
+  public List<GqlQueryInjectionPoint> getInjectionPoints() {
     return injectionPoints;
   }
 
@@ -81,7 +81,7 @@ class GqlNodeVisitorInjectionPointCollector extends NodeVisitorStub {
       String valueAsString = getValue(value);
       int offset = getOffset(line, column);
 
-      GqlInjectionPoint point = new GqlInjectionPoint(name,
+      GqlQueryInjectionPoint point = new GqlQueryInjectionPoint(name,
           valueAsString,
           line,
           column,

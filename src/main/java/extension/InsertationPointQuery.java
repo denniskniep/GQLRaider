@@ -4,22 +4,22 @@ import burp.BurpExtender;
 import burp.IExtensionHelpers;
 import burp.IScannerInsertionPoint;
 import extension.gql.GqlEditor;
-import extension.gql.GqlInjectionPoint;
+import extension.gql.GqlQueryInjectionPoint;
 import extension.gql.GqlRequest;
 import extension.utils.ArrayUtils;
 import extension.utils.Logger;
 
-public class InsertationPoint implements IScannerInsertionPoint {
+public class InsertationPointQuery implements IScannerInsertionPoint {
 
   private static Logger logger = BurpExtender.getLogger();
   private IExtensionHelpers helpers;
 
   private BurpRequest burpRequest;
   private GqlRequest gqlRequest;
-  private GqlInjectionPoint insertationPoint;
+  private GqlQueryInjectionPoint insertationPoint;
 
-  public InsertationPoint(IExtensionHelpers helpers, BurpRequest burpRequest, GqlRequest gqlRequest,
-      GqlInjectionPoint insertationPoint) {
+  public InsertationPointQuery(IExtensionHelpers helpers, BurpRequest burpRequest, GqlRequest gqlRequest,
+      GqlQueryInjectionPoint insertationPoint) {
     this.helpers = helpers;
     this.burpRequest = burpRequest;
     this.gqlRequest = gqlRequest;
@@ -28,7 +28,7 @@ public class InsertationPoint implements IScannerInsertionPoint {
 
   @Override
   public String getInsertionPointName() {
-    return "GraphQL Parameter:" + insertationPoint.getName();
+    return "GraphQLQueryParameter:" + insertationPoint.getName();
   }
 
   @Override
@@ -40,16 +40,15 @@ public class InsertationPoint implements IScannerInsertionPoint {
   public byte[] buildRequest(byte[] payload) {
     String payloadAsString = helpers.bytesToString(payload);
     GqlEditor editor = new GqlEditor();
-    String modifiedRequest = editor.replace(gqlRequest, insertationPoint, payloadAsString);
-    logger.log("Param:" + insertationPoint.getName() + ";  Payload:"+payloadAsString+"" );
+    String modifiedRequest = editor.replaceInQuery(gqlRequest, insertationPoint, payloadAsString);
+    logger.log("ParamQuery:" + insertationPoint.getName() + ";  Payload:" + payloadAsString + "");
     byte[] modifiedBody = helpers.stringToBytes(modifiedRequest);
     return ArrayUtils.concat(burpRequest.getHeader(), modifiedBody);
   }
 
   @Override
   public int[] getPayloadOffsets(byte[] payload) {
-    // since the payload is being inserted into a serialized data structure, there aren't any offsets
-    // into the request where the payload literally appears
+    // since the payload is being inserted into a multiple escaped data structure its a bit tricky to find out the offsets
     return null;
   }
 

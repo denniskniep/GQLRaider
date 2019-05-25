@@ -18,7 +18,7 @@ public class GqlEditor {
     return requestJson.toString();
   }
 
-  public String replace(GqlRequest originalRequest, GqlInjectionPoint injectionPoint, String payload){
+  public String replaceInQuery(GqlRequest originalRequest, GqlQueryInjectionPoint injectionPoint, String payload){
     String query = originalRequest.getQuery();
     String queryBefore = query.substring(0, injectionPoint.getOffset());
     String queryAfter = query.substring(injectionPoint.getOffset() + injectionPoint.getValue().length());
@@ -28,6 +28,16 @@ public class GqlEditor {
     String newQuery = queryBefore + escapedPayload + queryAfter;
 
     return modify(originalRequest, new GqlRequest(null, newQuery, null, null));
+  }
+
+  public String replaceInVariables(GqlRequest original, GqlVariableInjectionPoint injectionPoint, String payload) {
+    String variables = original.getVariables();
+    JsonParser parser = new JsonParser();
+    JsonObject vars = parser.parse(variables).getAsJsonObject();
+    vars.addProperty(injectionPoint.getName(), payload);
+
+    String newVariables = vars.toString();
+    return modify(original, new GqlRequest(null, null, newVariables, null));
   }
 
   /**

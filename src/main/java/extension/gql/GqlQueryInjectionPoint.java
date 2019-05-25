@@ -1,13 +1,13 @@
 package extension.gql;
 
-public class GqlInjectionPoint {
+public class GqlQueryInjectionPoint {
   private String name;
   private String value;
   private int line;
   private int column;
   private int offset;
 
-  public GqlInjectionPoint(String name, String value, int line, int column, int offset) {
+  public GqlQueryInjectionPoint(String name, String value, int line, int column, int offset) {
     this.name = name;
     this.value = value;
     this.line = line;

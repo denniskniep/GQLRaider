@@ -13,19 +13,19 @@ public class GqlQueryParser {
 
   private static Logger logger = BurpExtender.getLogger();
 
-  public List<GqlInjectionPoint> extractInsertationPoints(GqlRequest gqlRequest){
-    if(gqlRequest.getQuery() == null || gqlRequest.getQuery().isEmpty()) {
+  public List<GqlQueryInjectionPoint> extractInsertationPoints(String query){
+    if(query == null || query.isEmpty()) {
       return new ArrayList<>();
     }
 
     try{
-    Document document = parseAsDoument(gqlRequest.getQuery());
-    GqlNodeVisitorInjectionPointCollector visitor = new GqlNodeVisitorInjectionPointCollector(gqlRequest.getQuery());
+    Document document = parseAsDoument(query);
+    GqlNodeVisitorInjectionPointCollector visitor = new GqlNodeVisitorInjectionPointCollector(query);
     NodeTraverser nodeTraverser = new NodeTraverser();
     nodeTraverser.depthFirst(visitor, document.getChildren());
     return visitor.getInjectionPoints();
     }catch (Exception e){
-      logger.log("Error while trying to get injection points" + e.getMessage());
+      logger.log("Error while trying to get injection points from query" + e.getMessage());
       return new ArrayList<>();
     }
   }
