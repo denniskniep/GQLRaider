@@ -43,3 +43,12 @@ JSON-encoded body
   "variables": { "myVariable": "someValue", ... }
 }
 ```
+
+## Develop
+
+## Release
+A GitHub Release is triggered by AzureDevOps if a tag with the pattern "v*" is added
+
+`git tag v1.0.0`
+
+`git push --tags`
