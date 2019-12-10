@@ -1,14 +1,12 @@
 package extension.gql;
 
 import burp.BurpExtender;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import extension.utils.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import extension.utils.JsonUtils;
 
 public class GqlEditor {
 
@@ -38,9 +36,17 @@ public class GqlEditor {
     String variables = original.getVariables();
     JsonParser parser = new JsonParser();
     String injectKey = injectionPoint.getName();
-    String newVariables;
-    logger.log("Preparing to inject for key: " + injectKey);
+    String injectValue = injectionPoint.getValue();
 
+    String newVariables;
+    logger.log("Preparing to inject for key: " + injectKey + "with payload " + payload);
+    JsonObject vars = parser.parse(variables).getAsJsonObject();
+
+    JsonUtils.setJsonElement(vars, injectKey, payload);
+
+    newVariables = vars.toString();
+
+    /* old garbage first attempt
     if(injectKey.contains("||"))
     {
       logger.log("inject key contains a ||  so treating as nested ");
@@ -55,7 +61,16 @@ public class GqlEditor {
 
         if(i == injectKeyList.length-1)
         {
-          nestedJson.getAsJsonObject().addProperty(injectKeyList[i], payload);
+          if(injectValue == "||array||") {
+            JsonArray oldArray = nestedJson.getAsJsonArray();
+            nestedJson.getAsJsonObject().addProperty(injectKeyList[i], payload);
+
+          }
+          else {
+            nestedJson.getAsJsonObject().addProperty(injectKeyList[i], payload);
+
+
+          }
           newVariables = vars.toString();
           logger.log("Inserted nested var: " + newVariables);
         }
@@ -74,6 +89,7 @@ public class GqlEditor {
       newVariables = vars.toString();
 
     }
+    */
     return modify(original, new GqlRequest(null, null, newVariables, null));
   }
 

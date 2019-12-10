@@ -13,27 +13,37 @@ public class GqlVariableParser {
 
   private static Logger logger = BurpExtender.getLogger();
 
-  private void addJsonToIpoints(JsonObject vars, List<GqlVariableInjectionPoint> iPoints,String prev_key)
+  private void addJsonToIpoints(JsonElement vars, List<GqlVariableInjectionPoint> iPoints,String prev_key)
   {
-    for (Entry<String, JsonElement> element : vars.entrySet()) {
-      String key = element.getKey();
-      if (prev_key!="")
+    if(vars.isJsonObject()) {
+      for (Entry<String, JsonElement> element : vars.getAsJsonObject().entrySet()) {
+        String key = element.getKey();
+        if (prev_key != "") {
 
-      {
-        key = prev_key + "||" + key;
+          //use json paths
+          key = prev_key + "." + key;
+        }
+
+        addJsonToIpoints(element.getValue(), iPoints, key);
+
       }
-      if (element.getValue().isJsonObject())
-      {
-        JsonObject jsonValue = element.getValue().getAsJsonObject();
-        addJsonToIpoints(jsonValue, iPoints ,key);
-      }
-      else {
-        String value = element.getValue().getAsString();
-        iPoints.add(new GqlVariableInjectionPoint(key, value));
+    }else if (vars.isJsonArray()) {
+      int i = 0;
+      for (JsonElement item : vars.getAsJsonArray()) {
+
+        String arraykey = prev_key + String.format("[%d]", i);
+        addJsonToIpoints(item, iPoints, arraykey);
+        i++;
       }
     }
-
+    else if(vars.isJsonPrimitive()) {
+          String value = vars.getAsString();
+          iPoints.add(new GqlVariableInjectionPoint(prev_key, value));
+        }
   }
+
+
+
 
 
 
