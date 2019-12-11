@@ -68,7 +68,7 @@ public class JsonUtils {
                 int ix = Integer.valueOf(key) - 1;
                 if(((JsonArray)result).get(ix).isJsonPrimitive())
                 {
-                    ((JsonArray)result).set(1,  new JsonPrimitive(payload));
+                    ((JsonArray)result).set(ix,  new JsonPrimitive(payload));
                     return;
                 }
                 result = ((JsonArray)result).get(ix);
